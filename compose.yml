@@ -1,0 +1,39 @@
+services:
+  grpc:
+    container_name: rust-grpc
+    build:
+      context: .
+      dockerfile: ./docker/local/rust/Dockerfile
+    command: cargo watch -x run
+    volumes:
+      - ./app:/app
+    ports:
+      - "50051:50051"
+    # .env.testing利用時に上書きしたい環境変数を設定する
+    environment:
+      - ENV
+      - GRPC_PORT
+      - RUST_LOG
+    tty: true
+    stdin_open: true
+#     depends_on:
+#       - pg-db
+#   pg-db:
+#     container_name: rust-db
+#     build:
+#       context: .
+#       dockerfile: ./docker/local/db/Dockerfile
+#     environment:
+#       - POSTGRES_DB=pg-db
+#       - POSTGRES_USER=pg-user
+#       - POSTGRES_PASSWORD=pg-password
+#       - POSTGRES_INITDB_ARGS=--locale=ja_JP.utf8
+#       - TZ=Asia/Tokyo
+#     ports:
+#       - "5432:5432"
+#     volumes:
+#       - ./docker/local/db/init:/docker-entrypoint-initdb.d
+#       - pg-db-data:/var/lib/postgresql/data
+# volumes:
+#   pg-db-data:
+#     driver: local

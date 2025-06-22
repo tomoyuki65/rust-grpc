@@ -29,13 +29,13 @@ RUN addgroup --system --gid 1001 appuser && \
     adduser --system --uid 1001 appuser
 
 # ビルドステージで作成したバイナリをコピー
-COPY --from=builder --chown=appuser:appuser /build/target/release/rust_api .
+COPY --from=builder --chown=appuser:appuser /build/target/release/rust_grpc .
 
 # ポートを設定
-EXPOSE 8080
+EXPOSE 50051
 
 # コンテナ起動ユーザー設定
 USER appuser
 
 # APIサーバー起動コマンド
-CMD ["./rust_api"]
+CMD ["./rust_grpc"]

@@ -1,0 +1,44 @@
+syntax = "proto3";
+
+//import "validate/validate.proto";
+
+package sample;
+
+option go_package="pb/sample";
+
+// 空のリクエストパラメータ
+message Empty {}
+
+// Helloメソッドのレスポンス結果
+message HelloResponseBody {
+  // メッセージ
+  string message = 1;
+}
+
+// HelloAddTextメソッドのリクエストパラメータ
+message HelloAddTextRequestBody {
+  // テキスト
+  string text = 1;
+}
+
+// HelloAddTextメソッドのレスポンス結果
+message HelloAddTextResponseBody {
+  // メッセージ
+  string message = 1;
+}
+
+// サンプルサービス
+service SampleService {
+  // 「Hello World !!」を出力
+  rpc Hello(Empty) returns (HelloResponseBody) {}
+    // Returns:
+    // - 0 OK: HelloResponseBodyを出力
+    // - 2 Unknown: 不明なエラー
+
+  // 「Hello {リクエストパラメータのtext}」を出力
+  rpc HelloAddText(HelloAddTextRequestBody) returns (HelloAddTextResponseBody) {}
+    // Returns: 
+    // - 0 OK: HelloAddTextResponseBodyを出力 
+    // - 2 Unknown: 不明なエラー 
+    // - 3 INVALID_ARGUMENT: バリデーションエラー 
+}

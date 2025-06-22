@@ -15,6 +15,7 @@ async fn main() {
     init_logger();
 
     // サーバー起動のログ出力
+    log::info!("Start rust_grpc !!");
     // log::info!("Start rust_api (ENV:{}) !!", config.env);
 
     // サーバー起動

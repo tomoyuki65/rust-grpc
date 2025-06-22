@@ -68,7 +68,7 @@ where
             request_id: uuid,
             uri: uri_string,
         };
-        logger::info(&ctx, "Start request !!");
+        logger::info(&ctx, "Start gRPC request !!");
 
         // 非同期処理のためself.innerをコピー
         let mut inner = self.inner.clone();
@@ -78,7 +78,7 @@ where
             let res = inner.call(req).await;
 
             // 処理完了後にリクエスト終了ログ
-            logger::info(&ctx, "Finish request !!");
+            logger::info(&ctx, "Finish gRPC request !!");
 
             res
         })

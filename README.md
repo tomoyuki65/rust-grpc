@@ -40,12 +40,12 @@ docker compose down
   
 ### 1. フォーマット修正
 ```
-docker compose exec api cargo fmt
+docker compose exec grpc cargo fmt
 ```  
   
 ### 2. コード解析チェック
 ```
-docker compose exec api cargo clippy
+docker compose exec grpc cargo clippy
 ```  
   
 ### 3. テストコードの実行

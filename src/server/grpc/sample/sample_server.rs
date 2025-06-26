@@ -16,9 +16,15 @@ pub mod sample_proto {
     tonic::include_proto!("sample");
 }
 
+// リポジトリ
+use crate::repositories::sample::sample_repository::SampleRepository;
+
+// サービス
+use crate::services::sample::sample_service::{SampleCommonRepository, SampleService};
+
 // ユースケース
 use crate::usecases::sample::hello_add_text_usecase::SampleHelloAddTextUsecase;
-use crate::usecases::sample::hello_usecase::SampleHelloUsecase;
+use crate::usecases::sample::hello_usecase::{SampleCommonService, SampleHelloUsecase};
 
 // 構造体定義
 #[derive(Debug, Default)]
@@ -35,7 +41,13 @@ impl sample_proto::sample_service_server::SampleService for SampleServer {
         let ctx = create_context(&request);
 
         // インスタンス化
-        let usecase = SampleHelloUsecase {};
+        let sample_repo = Box::new(SampleRepository::new());
+        let sample_common_repo = SampleCommonRepository { sample_repo };
+        let sample_service = SampleService::new(sample_common_repo);
+        let sample_common_service = SampleCommonService { sample_service };
+        let usecase = SampleHelloUsecase {
+            service: sample_common_service,
+        };
 
         // ユースケースの実行
         usecase.exec(ctx).await

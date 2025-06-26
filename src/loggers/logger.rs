@@ -39,7 +39,7 @@ pub fn info(ctx: &Context, msg: &str) {
     let config = get_config();
 
     // ENV=testing以外の場合にログ出力
-    if config.env != "testing".to_string() {
+    if config.env != "testing" {
         let info = get_info_from_request(ctx);
         log::info!("[{}] {}", info, msg);
     }
@@ -50,7 +50,7 @@ pub fn info(ctx: &Context, msg: &str) {
 //     let config = get_config();
 
 //     // ENV=testing以外の場合にログ出力
-//     if config.env != "testing".to_string() {
+//     if config.env != "testing" {
 //         let info = get_info_from_request(ctx);
 //         log::warn!("[{}] {}", info, msg);
 //     }
@@ -60,7 +60,7 @@ pub fn error(ctx: &Context, msg: &str) {
     let config = get_config();
 
     // ENV=testing以外の場合にログ出力
-    if config.env != "testing".to_string() {
+    if config.env != "testing" {
         let info = get_info_from_request(ctx);
         log::error!("[{}] {}", info, msg);
     }

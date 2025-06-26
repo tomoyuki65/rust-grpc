@@ -48,6 +48,13 @@ docker compose exec api cargo fmt
 docker compose exec api cargo clippy
 ```  
   
+### 3. テストコードの実行
+<span style="color:red">事前にテスト用環境変数を設定したローカルサーバーを起動（docker compose --env-file ./.env.testing up -d）してから以下のコマンドを使ってテストを実行して下さい</span>  
+```
+docker compose exec -e CARGO_TEST=testing grpc cargo test -- --nocapture --test-threads=1
+```  
+> ※DBのデータの同期を考慮して「--test-threads=1」で実行する
+  
 <br />
   
 ## protoファイルからのコード生成について  

@@ -1,4 +1,5 @@
 // モジュールのインポート
+mod configs;
 mod contexts;
 mod interceptors;
 mod loggers;
@@ -6,17 +7,20 @@ mod middleware;
 mod routers;
 mod server;
 mod usecases;
+use configs::config::get_config;
 use loggers::logger::init_logger;
 use routers::router::router;
 
 #[tokio::main]
 async fn main() {
+    // 環境変数取得
+    let config = get_config();
+
     // ロガーの初期化
     init_logger();
 
     // サーバー起動のログ出力
-    log::info!("Start rust_grpc !!");
-    // log::info!("Start rust_api (ENV:{}) !!", config.env);
+    log::info!("[ENV={}] Start rust_grpc !!", config.env);
 
     // サーバー起動
     router().await.unwrap();

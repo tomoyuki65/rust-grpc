@@ -1,6 +1,15 @@
 // tonic
 use tonic::{Request, Response, Status};
 
+// バリデーション用のトレイト
+use prost_validate::Validator;
+
+// 共通コンテキスト
+use crate::contexts::context::create_context;
+
+// ロガー
+use crate::loggers::logger;
+
 // ビルドしたprotoファイルのインポート
 pub mod sample_proto {
     // protoファイルに定義したpakage名を指定
@@ -22,22 +31,41 @@ impl sample_proto::sample_service_server::SampleService for SampleServer {
         &self,
         request: Request<sample_proto::Empty>,
     ) -> Result<Response<sample_proto::HelloResponseBody>, Status> {
+        // コンテキスト設定
+        let ctx = create_context(&request);
+
         // インスタンス化
         let usecase = SampleHelloUsecase {};
 
         // ユースケースの実行
-        usecase.exec(request).await
+        usecase.exec(ctx).await
     }
 
     async fn hello_add_text(
         &self,
         request: Request<sample_proto::HelloAddTextRequestBody>,
     ) -> Result<Response<sample_proto::HelloAddTextResponseBody>, Status> {
+        // コンテキスト設定
+        let ctx = create_context(&request);
+
+        // リクエストボディを取得
+        let req_body = request.into_inner();
+
+        // バリデーションチェック
+        match req_body.validate() {
+            Ok(_) => {}
+            Err(e) => {
+                let msg = format!("バリデーションエラー: {}", e);
+                logger::error(&ctx, &msg);
+                return Err(Status::invalid_argument(msg));
+            }
+        };
+
         // インスタンス化
         let usecase = SampleHelloAddTextUsecase {};
 
         // ユースケースの実行
-        usecase.exec(request).await
+        usecase.exec(ctx, req_body).await
     }
 }
 

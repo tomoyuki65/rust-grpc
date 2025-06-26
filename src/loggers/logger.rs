@@ -5,6 +5,9 @@ use std::io::Write;
 // 共通コンテキスト
 use crate::contexts::context::Context;
 
+// コンフィング設定
+use crate::configs::config::get_config;
+
 // ロガーの初期化用関数
 pub fn init_logger() {
     // 日本時間を取得
@@ -33,17 +36,32 @@ fn get_info_from_request(ctx: &Context) -> String {
 
 // ログ出力用関数
 pub fn info(ctx: &Context, msg: &str) {
-    let info = get_info_from_request(ctx);
-    log::info!("[{}] {}", info, msg);
-}
+    let config = get_config();
 
-pub fn warn(ctx: &Context, msg: &str) {
-    let info = get_info_from_request(ctx);
-    log::warn!("[{}] {}", info, msg);
+    // ENV=testing以外の場合にログ出力
+    if config.env != "testing".to_string() {
+        let info = get_info_from_request(ctx);
+        log::info!("[{}] {}", info, msg);
+    }
 }
 
 // TODO: 使用する場合にコメントアウトを外す
-// pub fn error(ctx: &Context, msg: &str) {
-//     let info = get_info_from_request(ctx);
-//     log::error!("[{}] {}", info, msg);
+// pub fn warn(ctx: &Context, msg: &str) {
+//     let config = get_config();
+
+//     // ENV=testing以外の場合にログ出力
+//     if config.env != "testing".to_string() {
+//         let info = get_info_from_request(ctx);
+//         log::warn!("[{}] {}", info, msg);
+//     }
 // }
+
+pub fn error(ctx: &Context, msg: &str) {
+    let config = get_config();
+
+    // ENV=testing以外の場合にログ出力
+    if config.env != "testing".to_string() {
+        let info = get_info_from_request(ctx);
+        log::error!("[{}] {}", info, msg);
+    }
+}

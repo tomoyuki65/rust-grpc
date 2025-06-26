@@ -37,11 +37,10 @@ pub fn info(ctx: &Context, msg: &str) {
     log::info!("[{}] {}", info, msg);
 }
 
-// TODO: 使用する場合にコメントアウトを外す
-// pub fn warn(ctx: &Context, msg: &str) {
-//     let info = get_info_from_request(ctx);
-//     log::warn!("[{}] {}", info, msg);
-// }
+pub fn warn(ctx: &Context, msg: &str) {
+    let info = get_info_from_request(ctx);
+    log::warn!("[{}] {}", info, msg);
+}
 
 // TODO: 使用する場合にコメントアウトを外す
 // pub fn error(ctx: &Context, msg: &str) {

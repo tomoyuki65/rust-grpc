@@ -4,7 +4,14 @@ RustのtonicによるgRPCサーバーの開発用サンプルです。
 <br />
   
 ## 要件
-・Rustのバージョンは<span style="color:green">1.87</span>です。  
+・Rust: <span style="color:green">1.87</span>  
+・tonic: <span style="color:green">0.13.1</span>  
+・tonic-build: <span style="color:green">0.13.1</span>  
+・prost: <span style="color:green">0.13.5</span>  
+・prost-build: <span style="color:green">0.13.5</span>  
+・prost-validate: <span style="color:green">0.2.7</span>  
+・prost-validate-build: <span style="color:green">0.2.7</span>  
+> <span style="color:red">※利用するバージョンによっては互換性が無い可能性があるので注意して下さい。</span>  
   
 <br />
   
@@ -48,6 +55,6 @@ docker compose exec api cargo clippy
   
 また、エンドポイントの仕様については、protoファイルから生成したドキュメントファイル「doc/docs.md」を確認して下さい。そしてドキュメントの修正が必要な際は以下のコマンドを実行して下さい。  
 ```
-docker compose exec grpc protoc --doc_out=./doc --doc_opt=markdown,docs.md ./proto/sample/sample.proto
+docker compose exec grpc protoc -I=.:../root/go/pkg/mod/github.com/envoyproxy/protoc-gen-validate@v1.2.1 --doc_out=./doc --doc_opt=markdown,docs.md ./proto/sample/sample.proto
 ```  
   

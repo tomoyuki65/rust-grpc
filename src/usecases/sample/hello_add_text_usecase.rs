@@ -33,17 +33,15 @@ impl SampleHelloAddTextUsecase {
             Err(e) => {
                 let msg = format!("バリデーションエラー: {}", e);
                 logger::warn(&ctx, &msg);
-                return Err(Status::invalid_argument(msg))
+                return Err(Status::invalid_argument(msg));
             }
         };
 
         // レスポンスメッセージの設定
         let msg = format!("Hello {}", req_body.text);
-    
+
         // レスポンスボディの設定
-        let res_body = sample_proto::HelloAddTextResponseBody {
-            message: msg,
-        };
+        let res_body = sample_proto::HelloAddTextResponseBody { message: msg };
 
         // メタデータにrequest-idを追加
         let mut res = Response::new(res_body);

@@ -1,8 +1,20 @@
 // tonic
-use tonic::{Response, Status, Request, Streaming};
+use tonic::{
+    Response,
+    Status,
+    Request,
+    Streaming,
+    metadata::{
+        MetadataValue,
+        Ascii,
+    },
+};
 
 // バリデーション用のトレイト
 use prost_validate::Validator;
+
+// 変換用
+use std::str::FromStr;
 
 // 共通コンテキスト
 use crate::contexts::context::create_context;
@@ -24,8 +36,13 @@ impl SampleHelloClientStreamUsecase {
         // コンテキスト設定
         let ctx = create_context(&request);
 
+        // トレーラー用
+        let x_request_id = MetadataValue::<Ascii>::from_str(ctx.request_id.as_str()).expect("-");
+
         // リクエストからストリームを取り出す
         let mut stream = request.into_inner();
+
+        logger::info(&ctx, "Start Client Stream !!");
 
         // ストリームからデータを1件ずつ受信し、ストリームが閉じるまでループ
         let mut lists = Vec::new();
@@ -36,7 +53,9 @@ impl SampleHelloClientStreamUsecase {
                 Err(e) => {
                     let msg = format!("バリデーションエラー: {}", e);
                     logger::error(&ctx, &msg);
-                    return Err(Status::invalid_argument(msg));
+                    let mut status = Status::invalid_argument(msg);
+                    status.metadata_mut().insert("x-request-id", x_request_id.clone());
+                    return Err(status);
                 }
             }
 
@@ -48,11 +67,16 @@ impl SampleHelloClientStreamUsecase {
         let msg = lists.join(",");
 
         // レスポンスを設定
-        let res = sample_proto::HelloClientStreamResponseBody {
+        let mut res = Response::new(sample_proto::HelloClientStreamResponseBody {
             message: msg
-        };
+        });
+
+        // トレーラー設定
+        res.metadata_mut().insert("x-request-id", x_request_id);
+
+        logger::info(&ctx, "Finish Server Stream !!");
 
         // 戻り値
-        Ok(Response::new(res))
+        Ok(res)
     }
 }

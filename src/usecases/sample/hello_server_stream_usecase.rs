@@ -1,12 +1,23 @@
 // tonic
-use tonic::{Response, Status};
+use tonic::{
+    Response,
+    Status,
+    metadata::{
+        MetadataValue,
+        Ascii,
+    },
+};
 
 // tokio
 use tokio::{
     sync::mpsc,
+    spawn,
     time::{sleep, Duration},
 };
 use tokio_stream::wrappers::ReceiverStream;
+
+// 変換用
+use std::str::FromStr;
 
 // 共通コンテキスト
 use crate::contexts::context::Context;
@@ -29,12 +40,15 @@ impl SampleHelloServerStreamUsecase {
         ctx: Context,
         req_body: sample_proto::HelloServerStreamRequestBody,
     ) -> Result<Response<HelloServerStreamStream>, Status> {
+        // トレーラー用
+        let x_request_id = MetadataValue::<Ascii>::from_str(ctx.request_id.as_str()).expect("-");
+
         // mpsc (multi-producer, single-consumer) チャンネルの作成
-        // サーバーはこのチャンネルにデータ送信し、その後クライアントにウトリーミングする
+        // サーバーはこのチャンネルにデータ送信し、その後クライアントにストリーミングする
         // バッファサイズは適宜調整が必要だが、サーバーストリーミング機能なら1などでOK
         let (tx, rx) = mpsc::channel(1);
 
-        tokio::spawn(async move {
+        spawn(async move {
             logger::info(&ctx, "Start Server Stream !!");
             // n件のデータをクライアントに返す（今回は3件）
             for i in 1..=3 {
@@ -49,12 +63,30 @@ impl SampleHelloServerStreamUsecase {
                     // クライアントの接続切れなどでエラーの場合
                     let msg = format!("Failed to send data: {:?}", e);
                     logger::error(&ctx, &msg);
+                    let mut status = Status::invalid_argument(msg);
+                    status.metadata_mut().insert("x-request-id", x_request_id.clone());
+                    let _ = tx.send(Err(status)).await;
                     break;
                 }
 
                 // 1秒間待機処理
                 sleep(Duration::from_secs(1)).await;
             }
+
+            // トレーラーの設定
+            let mut status = Status::ok("Stream finished successfully");
+            status.metadata_mut().insert("x-request-id", x_request_id.clone());
+
+            // Errでラップしたステータスを送信
+            if let Err(e) = tx.send(Err(status)).await {
+                // クライアントの接続切れなどでエラーの場合
+                let msg = format!("Failed to send data: {:?}", e);
+                logger::error(&ctx, &msg);
+                let mut status = Status::invalid_argument(msg);
+                status.metadata_mut().insert("x-request-id", x_request_id);
+                let _ = tx.send(Err(status)).await;
+            }
+
             logger::info(&ctx, "Finish Server Stream !!");
         });
 

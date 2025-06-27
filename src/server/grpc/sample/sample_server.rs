@@ -1,6 +1,9 @@
 // tonic
 use tonic::{Request, Response, Status};
 
+// tokio
+use tokio_stream::wrappers::ReceiverStream;
+
 // バリデーション用のトレイト
 use prost_validate::Validator;
 
@@ -25,6 +28,7 @@ use crate::services::sample::sample_service::{SampleCommonRepository, SampleServ
 // ユースケース
 use crate::usecases::sample::hello_add_text_usecase::SampleHelloAddTextUsecase;
 use crate::usecases::sample::hello_usecase::{SampleCommonService, SampleHelloUsecase};
+use crate::usecases::sample::hello_server_stream_usecase::SampleHelloServerStreamUsecase;
 
 // 構造体定義
 #[derive(Debug, Default)]
@@ -75,6 +79,36 @@ impl sample_proto::sample_service_server::SampleService for SampleServer {
 
         // インスタンス化
         let usecase = SampleHelloAddTextUsecase {};
+
+        // ユースケースの実行
+        usecase.exec(ctx, req_body).await
+    }
+
+    // サーバーストリーミングの追加（typeの定義必須）
+    type HelloServerStreamStream = ReceiverStream<Result<sample_proto::HelloServerStreamResponseBody, Status>>;
+
+    async fn hello_server_stream(
+        &self,
+        request: tonic::Request<sample_proto::HelloServerStreamRequestBody>,
+    ) -> Result<Response<Self::HelloServerStreamStream>, Status> {
+        // コンテキスト設定
+        let ctx = create_context(&request);
+
+        // リクエストボディを取得
+        let req_body = request.into_inner();
+
+        // バリデーションチェック
+        match req_body.validate() {
+            Ok(_) => {}
+            Err(e) => {
+                let msg = format!("バリデーションエラー: {}", e);
+                logger::error(&ctx, &msg);
+                return Err(Status::invalid_argument(msg));
+            }
+        };
+
+        // インスタンス化
+        let usecase = SampleHelloServerStreamUsecase {};
 
         // ユースケースの実行
         usecase.exec(ctx, req_body).await

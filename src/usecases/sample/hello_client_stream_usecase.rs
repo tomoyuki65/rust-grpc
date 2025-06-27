@@ -1,13 +1,7 @@
 // tonic
 use tonic::{
-    Response,
-    Status,
-    Request,
-    Streaming,
-    metadata::{
-        MetadataValue,
-        Ascii,
-    },
+    Request, Response, Status, Streaming,
+    metadata::{Ascii, MetadataValue},
 };
 
 // バリデーション用のトレイト
@@ -54,7 +48,9 @@ impl SampleHelloClientStreamUsecase {
                     let msg = format!("バリデーションエラー: {}", e);
                     logger::error(&ctx, &msg);
                     let mut status = Status::invalid_argument(msg);
-                    status.metadata_mut().insert("x-request-id", x_request_id.clone());
+                    status
+                        .metadata_mut()
+                        .insert("x-request-id", x_request_id.clone());
                     return Err(status);
                 }
             }
@@ -67,9 +63,7 @@ impl SampleHelloClientStreamUsecase {
         let msg = lists.join(",");
 
         // レスポンスを設定
-        let mut res = Response::new(sample_proto::HelloClientStreamResponseBody {
-            message: msg
-        });
+        let mut res = Response::new(sample_proto::HelloClientStreamResponseBody { message: msg });
 
         // トレーラー設定
         res.metadata_mut().insert("x-request-id", x_request_id);

@@ -1,25 +1,16 @@
 // tonic
 use tonic::{
-    Response,
-    Status,
-    Request,
-    Streaming,
-    metadata::{
-        MetadataValue,
-        Ascii,
-    },
+    Request, Response, Status, Streaming,
+    metadata::{Ascii, MetadataValue},
 };
 
 // tokio
 use tokio::{
-    sync::mpsc,
     spawn,
-    time::{sleep, Duration},
+    sync::mpsc,
+    time::{Duration, sleep},
 };
-use tokio_stream::{
-    wrappers::ReceiverStream,
-    StreamExt,
-};
+use tokio_stream::{StreamExt, wrappers::ReceiverStream};
 
 // 変換用
 use std::str::FromStr;
@@ -40,13 +31,14 @@ use crate::server::grpc::sample::sample_server::sample_proto;
 pub struct SampleHelloBidirectionalStreamUsecase {}
 
 // ストリーミング用の型定義
-type HelloBidirectionalStreamStream = ReceiverStream<Result<sample_proto::HelloBidirectionalStreamResponseBody, Status>>;
+type HelloBidirectionalStreamStream =
+    ReceiverStream<Result<sample_proto::HelloBidirectionalStreamResponseBody, Status>>;
 
 impl SampleHelloBidirectionalStreamUsecase {
     pub async fn exec(
         &self,
         request: Request<Streaming<sample_proto::HelloBidirectionalStreamRequestBody>>,
-    ) -> Result<Response<HelloBidirectionalStreamStream>, Status,> {
+    ) -> Result<Response<HelloBidirectionalStreamStream>, Status> {
         // コンテキスト設定
         let ctx = create_context(&request);
 
@@ -73,7 +65,9 @@ impl SampleHelloBidirectionalStreamUsecase {
                                 let msg = format!("バリデーションエラー: {}", e);
                                 logger::error(&ctx, &msg);
                                 let mut status = Status::invalid_argument(msg);
-                                status.metadata_mut().insert("x-request-id", x_request_id.clone());
+                                status
+                                    .metadata_mut()
+                                    .insert("x-request-id", x_request_id.clone());
                                 let _ = tx.send(Err(status)).await;
                                 break;
                             }
@@ -81,7 +75,7 @@ impl SampleHelloBidirectionalStreamUsecase {
 
                         // レスポンスを設定
                         let res = sample_proto::HelloBidirectionalStreamResponseBody {
-                            message: req.text
+                            message: req.text,
                         };
 
                         // Okでラップしたレスポンスをtxで送信
@@ -90,7 +84,9 @@ impl SampleHelloBidirectionalStreamUsecase {
                             let msg = format!("Failed to send data: {:?}", e);
                             logger::error(&ctx, &msg);
                             let mut status = Status::invalid_argument(msg);
-                            status.metadata_mut().insert("x-request-id", x_request_id.clone());
+                            status
+                                .metadata_mut()
+                                .insert("x-request-id", x_request_id.clone());
                             let _ = tx.send(Err(status)).await;
                             break;
                         }
@@ -103,7 +99,9 @@ impl SampleHelloBidirectionalStreamUsecase {
                         let msg = format!("Failed to send data: {:?}", e);
                         logger::error(&ctx, &msg);
                         let mut status = Status::invalid_argument(msg);
-                        status.metadata_mut().insert("x-request-id", x_request_id.clone());
+                        status
+                            .metadata_mut()
+                            .insert("x-request-id", x_request_id.clone());
                         let _ = tx.send(Err(status)).await;
                         break;
                     }
@@ -112,7 +110,9 @@ impl SampleHelloBidirectionalStreamUsecase {
 
             // トレーラーの設定
             let mut status = Status::ok("Stream finished successfully");
-            status.metadata_mut().insert("x-request-id", x_request_id.clone());
+            status
+                .metadata_mut()
+                .insert("x-request-id", x_request_id.clone());
 
             // Errでラップしたステータスを送信
             if let Err(e) = tx.send(Err(status)).await {

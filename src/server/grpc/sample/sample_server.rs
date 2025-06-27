@@ -27,10 +27,10 @@ use crate::services::sample::sample_service::{SampleCommonRepository, SampleServ
 
 // ユースケース
 use crate::usecases::sample::hello_add_text_usecase::SampleHelloAddTextUsecase;
-use crate::usecases::sample::hello_usecase::{SampleCommonService, SampleHelloUsecase};
-use crate::usecases::sample::hello_server_stream_usecase::SampleHelloServerStreamUsecase;
-use crate::usecases::sample::hello_client_stream_usecase::SampleHelloClientStreamUsecase;
 use crate::usecases::sample::hello_bidirectional_stream_usecase::SampleHelloBidirectionalStreamUsecase;
+use crate::usecases::sample::hello_client_stream_usecase::SampleHelloClientStreamUsecase;
+use crate::usecases::sample::hello_server_stream_usecase::SampleHelloServerStreamUsecase;
+use crate::usecases::sample::hello_usecase::{SampleCommonService, SampleHelloUsecase};
 
 // 構造体定義
 #[derive(Debug, Default)]
@@ -88,7 +88,8 @@ impl sample_proto::sample_service_server::SampleService for SampleServer {
 
     // サーバーストリーミングの追加（typeの定義必須）
     // ※protoファイルで定義した名称+Streamという型の定義が必要になる
-    type HelloServerStreamStream = ReceiverStream<Result<sample_proto::HelloServerStreamResponseBody, Status>>;
+    type HelloServerStreamStream =
+        ReceiverStream<Result<sample_proto::HelloServerStreamResponseBody, Status>>;
 
     async fn hello_server_stream(
         &self,
@@ -131,12 +132,13 @@ impl sample_proto::sample_service_server::SampleService for SampleServer {
 
     // 双方向ストリーミングの追加（typeの定義必須）
     // ※protoファイルで定義した名称+Streamという型の定義が必要になる
-    type HelloBidirectionalStreamStream = ReceiverStream<Result<sample_proto::HelloBidirectionalStreamResponseBody, Status>>;
+    type HelloBidirectionalStreamStream =
+        ReceiverStream<Result<sample_proto::HelloBidirectionalStreamResponseBody, Status>>;
 
     async fn hello_bidirectional_stream(
         &self,
         request: Request<Streaming<sample_proto::HelloBidirectionalStreamRequestBody>>,
-    ) -> Result<Response<Self::HelloBidirectionalStreamStream>, Status,> {
+    ) -> Result<Response<Self::HelloBidirectionalStreamStream>, Status> {
         // インスタンス化
         let usecase = SampleHelloBidirectionalStreamUsecase {};
 

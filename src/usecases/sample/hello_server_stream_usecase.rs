@@ -1,18 +1,14 @@
 // tonic
 use tonic::{
-    Response,
-    Status,
-    metadata::{
-        MetadataValue,
-        Ascii,
-    },
+    Response, Status,
+    metadata::{Ascii, MetadataValue},
 };
 
 // tokio
 use tokio::{
-    sync::mpsc,
     spawn,
-    time::{sleep, Duration},
+    sync::mpsc,
+    time::{Duration, sleep},
 };
 use tokio_stream::wrappers::ReceiverStream;
 
@@ -32,7 +28,8 @@ use crate::server::grpc::sample::sample_server::sample_proto;
 pub struct SampleHelloServerStreamUsecase {}
 
 // ストリーミング用の型定義
-type HelloServerStreamStream = ReceiverStream<Result<sample_proto::HelloServerStreamResponseBody, Status>>;
+type HelloServerStreamStream =
+    ReceiverStream<Result<sample_proto::HelloServerStreamResponseBody, Status>>;
 
 impl SampleHelloServerStreamUsecase {
     pub async fn exec(
@@ -54,9 +51,7 @@ impl SampleHelloServerStreamUsecase {
             for i in 1..=3 {
                 // レスポンスの設定
                 let msg = format!("[{}] Hello {} !", i, req_body.text);
-                let res_body = sample_proto::HelloServerStreamResponseBody {
-                    message: msg,
-                };
+                let res_body = sample_proto::HelloServerStreamResponseBody { message: msg };
 
                 // Okでラップしたレスポンスをtxで送信
                 if let Err(e) = tx.send(Ok(res_body)).await {
@@ -64,7 +59,9 @@ impl SampleHelloServerStreamUsecase {
                     let msg = format!("Failed to send data: {:?}", e);
                     logger::error(&ctx, &msg);
                     let mut status = Status::invalid_argument(msg);
-                    status.metadata_mut().insert("x-request-id", x_request_id.clone());
+                    status
+                        .metadata_mut()
+                        .insert("x-request-id", x_request_id.clone());
                     let _ = tx.send(Err(status)).await;
                     break;
                 }
@@ -75,7 +72,9 @@ impl SampleHelloServerStreamUsecase {
 
             // トレーラーの設定
             let mut status = Status::ok("Stream finished successfully");
-            status.metadata_mut().insert("x-request-id", x_request_id.clone());
+            status
+                .metadata_mut()
+                .insert("x-request-id", x_request_id.clone());
 
             // Errでラップしたステータスを送信
             if let Err(e) = tx.send(Err(status)).await {

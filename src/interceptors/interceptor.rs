@@ -9,14 +9,15 @@ pub fn auth_interceptor(req: tonic::Request<()>) -> Result<Request<()>, Status> 
     };
 
     // 対象のuriの場合はスキップ
-    if uri == "/sample.SampleService/Hello" {
-        // println!("対象のメソッドです！！");
+    let skip_uri = vec![
+        "/sample.SampleService/Hello",
+    ];
+    if skip_uri.contains(&uri) {
         return Ok(req);
     }
 
     // リクエストヘッダーからトークン取得
     let token = match req.metadata().get("authorization") {
-        // Some(value) => value.to_str().unwrap_or_default(),
         Some(value) => {
             let bearer_token = value.to_str().unwrap_or_default();
             bearer_token.trim_start_matches("Bearer ")

@@ -68,7 +68,7 @@ impl SampleHelloClientStreamUsecase {
         // トレーラー設定
         res.metadata_mut().insert("x-request-id", x_request_id);
 
-        logger::info(&ctx, "Finish Server Stream !!");
+        logger::info(&ctx, "Finish Client Stream !!");
 
         // 戻り値
         Ok(res)

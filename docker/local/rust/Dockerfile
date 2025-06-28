@@ -11,9 +11,9 @@ RUN apt-get update && \
       protobuf-compiler \
       curl
 
- # gRPCのドキュメント生成やバリデーション用にgoをインストール
- # goのバージョンを変更したい場合は以下リンク先のページで必要情報をご確認下さい。
- # https://go.dev/dl/
+# gRPCのドキュメント生成やバリデーション用にgoをインストール
+# goのバージョンを変更したい場合は以下リンク先のページで必要情報をご確認下さい。
+# https://go.dev/dl/
 ENV GO_VERSION=1.24.4
 ENV GO_SHA256=d5501ee5aca0f258d5fe9bfaed401958445014495dc115f202d43d5210b45241
 ENV GO_OS=linux

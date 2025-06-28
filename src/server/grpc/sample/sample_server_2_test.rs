@@ -2,17 +2,15 @@
 
 // sample_serverのストリーミングのテスト
 mod sample_server_streaming_test {
-    use tokio_stream::{StreamExt, iter};
-    use tonic::Request;
     use crate::configs::config::get_config;
     use crate::contexts::context::Context;
     use crate::server::grpc::sample::sample_server::sample_proto::{
-        HelloServerStreamRequestBody,
-        HelloClientStreamRequestBody,
-        HelloBidirectionalStreamRequestBody,
-        sample_service_client::SampleServiceClient,
+        HelloBidirectionalStreamRequestBody, HelloClientStreamRequestBody,
+        HelloServerStreamRequestBody, sample_service_client::SampleServiceClient,
     };
     use crate::usecases::sample::hello_server_stream_usecase::SampleHelloServerStreamUsecase;
+    use tokio_stream::{StreamExt, iter};
+    use tonic::Request;
 
     #[tokio::test]
     async fn hello_server_stream_should_return_succeed_by_usecase() {
@@ -46,7 +44,6 @@ mod sample_server_streaming_test {
                 Ok(res) => {
                     let msg = format!("[{}] Hello Server Stream !", i);
                     assert_eq!(res.message, msg);
-                    
                 }
                 Err(_) => {}
             }
@@ -88,7 +85,6 @@ mod sample_server_streaming_test {
                 Ok(res) => {
                     let msg = format!("[{}] Hello Server Stream !", i);
                     assert_eq!(res.message, msg);
-                    
                 }
                 Err(_) => {}
             }
@@ -108,14 +104,20 @@ mod sample_server_streaming_test {
 
         // 送信するメッセージリスト作成
         let message_lists = vec![
-            HelloClientStreamRequestBody { text: "A".to_string() },
-            HelloClientStreamRequestBody { text: "B".to_string() },
-            HelloClientStreamRequestBody { text: "C".to_string() },
+            HelloClientStreamRequestBody {
+                text: "A".to_string(),
+            },
+            HelloClientStreamRequestBody {
+                text: "B".to_string(),
+            },
+            HelloClientStreamRequestBody {
+                text: "C".to_string(),
+            },
         ];
 
         // ストリームの作成
         let mut request = Request::new(iter(message_lists));
-        
+
         // メタデータにBearerトークンを追加
         request
             .metadata_mut()
@@ -142,13 +144,17 @@ mod sample_server_streaming_test {
 
         // 送信するメッセージリスト作成
         let message_lists = vec![
-            HelloBidirectionalStreamRequestBody { text: "A".to_string() },
-            HelloBidirectionalStreamRequestBody { text: "B".to_string() },
+            HelloBidirectionalStreamRequestBody {
+                text: "A".to_string(),
+            },
+            HelloBidirectionalStreamRequestBody {
+                text: "B".to_string(),
+            },
         ];
 
         // ストリームの作成
         let mut request = Request::new(iter(message_lists.clone()));
-        
+
         // メタデータにBearerトークンを追加
         request
             .metadata_mut()
@@ -168,7 +174,6 @@ mod sample_server_streaming_test {
                 Ok(res) => {
                     let msg = message_lists[i].text.clone();
                     assert_eq!(res.message, msg);
-                    
                 }
                 Err(_) => {}
             }

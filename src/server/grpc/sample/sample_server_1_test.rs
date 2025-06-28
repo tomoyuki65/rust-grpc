@@ -14,7 +14,7 @@ mod sample_server_test {
     use crate::usecases::sample::hello_usecase::{SampleCommonService, SampleHelloUsecase};
 
     #[tokio::test]
-    async fn hello_should_return_should_succeed() {
+    async fn hello_should_return_succeed() {
         /* ユースケースを実行して検証する場合 */
 
         // サンプルリポシトリーのインスタンス化

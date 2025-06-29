@@ -77,7 +77,7 @@ impl sample_proto::sample_service_server::SampleService for SampleServer {
                 logger::error(&ctx, &msg);
                 return Err(Status::invalid_argument(msg));
             }
-        };
+        }
 
         // インスタンス化
         let usecase = SampleHelloAddTextUsecase {};
@@ -109,7 +109,7 @@ impl sample_proto::sample_service_server::SampleService for SampleServer {
                 logger::error(&ctx, &msg);
                 return Err(Status::invalid_argument(msg));
             }
-        };
+        }
 
         // インスタンス化
         let usecase = SampleHelloServerStreamUsecase {};

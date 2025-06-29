@@ -4,8 +4,6 @@ import "validate/validate.proto";
 
 package sample;
 
-option go_package="pb/sample";
-
 // 空のリクエストパラメータ
 message Empty {}
 
